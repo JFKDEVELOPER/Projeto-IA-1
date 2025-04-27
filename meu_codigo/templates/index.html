@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Escolha a Rede Neural</title>
+</head>
+<body>
+    <h1>Escolha qual Rede Neural deseja usar:</h1>
+    <a href="{{ url_for('extracao_pixel') }}">
+        <button>Rede Neural com Extração de Características por Pixel</button>
+    </a>
+    <br><br>
+    <a href="{{ url_for('cnn') }}">
+        <button>Rede Neural Convolucional (CNN)</button>
+    </a>
+</body>
+</html>

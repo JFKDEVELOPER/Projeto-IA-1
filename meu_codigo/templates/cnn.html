@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Rede Neural Convolucional (CNN)</title>
+</head>
+<body>
+    <h1>Você está na Rede: Convolucional (CNN)</h1>
+
+    <form action="{{ url_for('cnn') }}" method="post" enctype="multipart/form-data">
+        <label>Selecione as pastas das classes (quantas quiser):</label><br>
+        <input type="file" name="folders" webkitdirectory directory multiple required><br><br>
+
+        <label>Número de camadas:</label><br>
+        <input type="number" name="camadas" required><br><br>
+
+        <label>Número de neurônios por camada:</label><br>
+        <input type="number" name="neuronios" required><br><br>
+
+        <label>Quantidade de épocas:</label><br>
+        <input type="number" name="epocas" required><br><br>
+
+        <button type="submit">Enviar e Treinar</button>
+    </form>
+</body>
+</html>

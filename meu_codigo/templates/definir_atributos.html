@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Definir Atributos de Cores</title>
+</head>
+<body>
+    <h1>Definir Atributos de Cor</h1>
+
+    <form action="{{ url_for('definir_atributos') }}" method="POST">
+        <h2>Personagem 1</h2>
+        <label>Cor 1:</label>
+        <input type="color" name="personagem1_cor1"><br><br>
+
+        <label>Cor 2:</label>
+        <input type="color" name="personagem1_cor2"><br><br>
+
+        <label>Cor 3:</label>
+        <input type="color" name="personagem1_cor3"><br><br>
+
+        <h2>Personagem 2</h2>
+        <label>Cor 1:</label>
+        <input type="color" name="personagem2_cor1"><br><br>
+
+        <label>Cor 2:</label>
+        <input type="color" name="personagem2_cor2"><br><br>
+
+        <label>Cor 3:</label>
+        <input type="color" name="personagem2_cor3"><br><br>
+
+        <button type="submit">Salvar Atributos</button>
+    </form>
+</body>
+</html>
