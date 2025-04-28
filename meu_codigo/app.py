@@ -10,18 +10,15 @@ from tensorflow.keras.layers import Dense
 
 app = Flask(__name__)
 
-# Caminho absoluto para garantir que a pasta de uploads fique dentro do diretório principal do projeto
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Caminho para o diretório onde o app.py está
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')  # Pasta 'uploads' dentro do diretório do projeto
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Pasta para salvar as imagens renomeadas como ícones
 ICONS_FOLDER = os.path.join(BASE_DIR, 'static', 'icons')
 os.makedirs(ICONS_FOLDER, exist_ok=True)
 
-# Caminho onde o CSV será salvo dentro da pasta de uploads
 RESULTADO_CSV = os.path.join(UPLOAD_FOLDER, 'resultado_extracao.csv')
 
 @app.route('/cnn')
@@ -90,6 +87,7 @@ def extracao_pixel():
                 except Exception as e:
                     return f"Erro ao salvar o arquivo {filename}: {str(e)}"
 
+<<<<<<< HEAD
         # A segunda pasta (arquivo) vai para personagem_2
         pasta_2 = arquivos[1]
         if pasta_2 and hasattr(pasta_2, 'filename') and pasta_2.filename != '':
@@ -100,11 +98,23 @@ def extracao_pixel():
                     file.save(os.path.join(pasta_personagem2, filename))
                 except Exception as e:
                     return f"Erro ao salvar o arquivo {filename}: {str(e)}"
+=======
+            filename = os.path.basename(folder.filename)
 
-        # Após salvar as imagens, renomeia as imagens de ícones
+            if i < len(folders) // 2:
+                destino = pasta_personagem1
+            else:
+                destino = pasta_personagem2
+
+            try:
+                folder.save(os.path.join(destino, filename))
+            except Exception as e:
+                return f"Erro ao salvar o arquivo {filename}: {str(e)}"
+>>>>>>> 926fe74f03b5cff0f980f1f35b3f87aa16a37a15
+
+        # Renomeia os ícones
         renomear_icons()
 
-        # Se tudo der certo, redireciona para a página de atributos
         return redirect(url_for('definir_atributos'))
 
     return render_template('extracao_pixel.html')
@@ -132,40 +142,49 @@ def renomear_icons():
 
 @app.route('/definir_atributos', methods=['GET', 'POST'])
 def definir_atributos():
+    cores_personagem1 = None
+    cores_personagem2 = None
+
     if request.method == 'POST':
-        atributos = {
-            'personagem1': [
-                request.form['personagem1_cor1'],
-                request.form['personagem1_cor2'],
-                request.form['personagem1_cor3']
-            ],
-            'personagem2': [
-                request.form['personagem2_cor1'],
-                request.form['personagem2_cor2'],
-                request.form['personagem2_cor3']
-            ]
-        }
+        try:
+            # Obter as cores dos atributos
+            atributos = {
+                'personagem1': [
+                    request.form['personagem1_cor1'],
+                    request.form['personagem1_cor2'],
+                    request.form['personagem1_cor3']
+                ],
+                'personagem2': [
+                    request.form['personagem2_cor1'],
+                    request.form['personagem2_cor2'],
+                    request.form['personagem2_cor3']
+                ]
+            }
 
-        tolerancia = 20
-        atributos_com_intervalo = {}
+            tolerancia = 20
+            atributos_com_intervalo = {}
 
-        for personagem, cores in atributos.items():
-            atributos_com_intervalo[personagem] = []
-            for cor in cores:
-                r = int(cor[1:3], 16)
-                g = int(cor[3:5], 16)
-                b = int(cor[5:7], 16)
+            # Processar cores
+            for personagem, cores in atributos.items():
+                atributos_com_intervalo[personagem] = []
+                for cor in cores:
+                    if cor[0] != '#':
+                        raise ValueError(f"A cor {cor} não está no formato correto")
+                    r = int(cor[1:3], 16)
+                    g = int(cor[3:5], 16)
+                    b = int(cor[5:7], 16)
 
-                intervalo = {
-                    'R_min': max(0, r - tolerancia),
-                    'R_max': min(255, r + tolerancia),
-                    'G_min': max(0, g - tolerancia),
-                    'G_max': min(255, g + tolerancia),
-                    'B_min': max(0, b - tolerancia),
-                    'B_max': min(255, b + tolerancia)
-                }
-                atributos_com_intervalo[personagem].append(intervalo)
+                    intervalo = {
+                        'R_min': max(0, r - tolerancia),
+                        'R_max': min(255, r + tolerancia),
+                        'G_min': max(0, g - tolerancia),
+                        'G_max': min(255, g + tolerancia),
+                        'B_min': max(0, b - tolerancia),
+                        'B_max': min(255, b + tolerancia)
+                    }
+                    atributos_com_intervalo[personagem].append(intervalo)
 
+<<<<<<< HEAD
         # Após definir os atributos, processa as imagens
         X_train, X_test, y_train, y_test = gerar_csv(atributos_com_intervalo)
 
@@ -176,14 +195,24 @@ def definir_atributos():
         # Avaliar o modelo
         acuracia = modelo.evaluate(X_test, y_test)
         print(f"Acurácia do modelo: {acuracia[1]*100}%")
+=======
+            cores_personagem1 = atributos['personagem1']
+            cores_personagem2 = atributos['personagem2']
+>>>>>>> 926fe74f03b5cff0f980f1f35b3f87aa16a37a15
 
-        # Após gerar o CSV, disponibiliza para download
-        if not os.path.exists(RESULTADO_CSV):
-            return "Erro: O arquivo CSV não foi gerado corretamente."
-        
-        return send_file(RESULTADO_CSV, as_attachment=True)
+            # Gerar CSV com os atributos
+            gerar_csv(atributos_com_intervalo)
 
-    return render_template('definir_atributos.html')
+            if not os.path.exists(RESULTADO_CSV):
+                return "Erro: O arquivo CSV não foi gerado corretamente."
+
+            return send_file(RESULTADO_CSV, as_attachment=True)
+
+        except Exception as e:
+            return f"Erro ao processar atributos: {str(e)}"
+
+    # Passar as cores para o template
+    return render_template('definir_atributos.html', cores_personagem1=cores_personagem1, cores_personagem2=cores_personagem2)
 
 def verificar_pixel(pixel, intervalo):
     r, g, b = pixel
@@ -206,7 +235,6 @@ def gerar_csv(atributos_com_intervalo):
         for nome_arquivo in os.listdir(pasta_completa):
             caminho_arquivo = os.path.join(pasta_completa, nome_arquivo)
 
-            # Verifica se o arquivo é uma imagem
             try:
                 imagem = Image.open(caminho_arquivo)
                 imagem.verify()  # Verifica se é uma imagem válida
@@ -233,6 +261,7 @@ def gerar_csv(atributos_com_intervalo):
             dados_csv.append([nome_arquivo, 'personagem_1', contagem_p1])
             dados_csv.append([nome_arquivo, 'personagem_2', contagem_p2])
 
+<<<<<<< HEAD
             # Adicionar os dados para o modelo
             X.append([contagem_p1, contagem_p2])  # Aqui você pode adicionar outras características, se necessário
             y.append(0 if personagem == 'personagem_1' else 1)
@@ -241,6 +270,8 @@ def gerar_csv(atributos_com_intervalo):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Salvar o CSV
+=======
+>>>>>>> 926fe74f03b5cff0f980f1f35b3f87aa16a37a15
     try:
         with open(RESULTADO_CSV, mode='w', newline='') as file:
             writer = csv.writer(file)
