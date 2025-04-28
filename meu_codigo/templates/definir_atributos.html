@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <title>Definir Atributos de Cores</title>
@@ -133,9 +132,9 @@
             font-weight: bold;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
     </style>
 </head>
-
 <body>
 
     <h1>Definir Atributos de Cor</h1>
@@ -158,25 +157,23 @@
 
                     <label>Atributo 1:</label>
                     <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem1_cor1', '{{ color }}', this)"></button>
-
+                        {% for color in ['#70C8E0', '#78C850', '#A04000', '#FF0000', '#FFFF00', '#800080', '#FFA500', '#FFC0CB', '#808080', '#000000'] %}
+                            <button type="button" class="color-button" style="background-color: {{ color }};" onclick="setColor('personagem1_cor1', '{{ color }}', this)"></button>
+                        {% endfor %}
                     </div>
 
                     <label>Atributo 2:</label>
                     <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem1_cor2', '{{ color }}', this)"></button>
+                        {% for color in ['#70C8E0', '#78C850', '#A04000', '#FF0000', '#FFFF00', '#800080', '#FFA500', '#FFC0CB', '#808080', '#000000'] %}
+                            <button type="button" class="color-button" style="background-color: {{ color }};" onclick="setColor('personagem1_cor2', '{{ color }}', this)"></button>
+                        {% endfor %}
                     </div>
 
                     <label>Atributo 3:</label>
                     <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem1_cor3', '{{ color }}', this)"></button>
-
+                        {% for color in ['#70C8E0', '#78C850', '#A04000', '#FF0000', '#FFFF00', '#800080', '#FFA500', '#FFC0CB', '#808080', '#000000'] %}
+                            <button type="button" class="color-button" style="background-color: {{ color }};" onclick="setColor('personagem1_cor3', '{{ color }}', this)"></button>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -197,26 +194,23 @@
 
                     <label>Atributo 1:</label>
                     <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem2_cor1', '{{ color }}', this)"></button>
-
+                        {% for color in ['#70C8E0', '#78C850', '#A04000', '#FF0000', '#FFFF00', '#800080', '#FFA500', '#FFC0CB', '#808080', '#000000'] %}
+                            <button type="button" class="color-button" style="background-color: {{ color }};" onclick="setColor('personagem2_cor1', '{{ color }}', this)"></button>
+                        {% endfor %}
                     </div>
 
                     <label>Atributo 2:</label>
                     <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem2_cor2', '{{ color }}', this)"></button>
-
+                        {% for color in ['#70C8E0', '#78C850', '#A04000', '#FF0000', '#FFFF00', '#800080', '#FFA500', '#FFC0CB', '#808080', '#000000'] %}
+                            <button type="button" class="color-button" style="background-color: {{ color }};" onclick="setColor('personagem2_cor2', '{{ color }}', this)"></button>
+                        {% endfor %}
                     </div>
 
                     <label>Atributo 3:</label>
                     <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem2_cor3', '{{ color }}', this)"></button>
-
+                        {% for color in ['#70C8E0', '#78C850', '#A04000', '#FF0000', '#FFFF00', '#800080', '#FFA500', '#FFC0CB', '#808080', '#000000'] %}
+                            <button type="button" class="color-button" style="background-color: {{ color }};" onclick="setColor('personagem2_cor3', '{{ color }}', this)"></button>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -240,5 +234,4 @@
         }
     </script>
 </body>
-
 </html>
