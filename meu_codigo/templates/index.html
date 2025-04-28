@@ -2,16 +2,88 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Escolha a Rede Neural</title>
+    <title>Redes Neurais</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            background-color: #f0f2f2;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #333;
+        }
+
+        .buttons {
+            margin-top: 50px;
+            display: flex;
+            gap: 50px;
+        }
+
+        .button-box {
+            width: 250px;
+            height: 250px;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .button-box:hover {
+            background-color: #d0d0d0;
+        }
+
+        .button-box button {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Escolha qual Rede Neural deseja usar:</h1>
-    <a href="{{ url_for('extracao_pixel') }}">
-        <button>Rede Neural com Extração de Características por Pixel</button>
+
+<header>
+    <h1>Redes Neurais</h1>
+    <p>Jonathan ; Kauê ; Wesley</p>
+</header>
+
+<div class="buttons">
+    <a href="{{ url_for('extracao_pixel') }}" class="button-box">
+        <button>Extração de<br>Características por Pixel</button>
     </a>
-    <br><br>
-    <a href="{{ url_for('cnn') }}">
-        <button>Rede Neural Convolucional (CNN)</button>
+
+    <a href="{{ url_for('cnn') }}" class="button-box">
+        <button>Rede Neural<br>Convolucional (CNN)</button>
     </a>
+    
+    <a href="{{ url_for('classificar_imagem') }}" class="button-box">
+
+    
+    
+</div>
+
 </body>
 </html>

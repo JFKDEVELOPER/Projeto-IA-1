@@ -1,7 +1,12 @@
 import os
+import numpy as np
 from flask import Flask, render_template, request, redirect, url_for, send_file
 import csv
 from PIL import Image
+from tensorflow.keras.models import load_model
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
 
 app = Flask(__name__)
 
@@ -19,6 +24,41 @@ os.makedirs(ICONS_FOLDER, exist_ok=True)
 # Caminho onde o CSV será salvo dentro da pasta de uploads
 RESULTADO_CSV = os.path.join(UPLOAD_FOLDER, 'resultado_extracao.csv')
 
+@app.route('/cnn')
+def cnn():
+    # A lógica do seu endpoint CNN vai aqui
+    return "Aqui está o CNN!"
+
+@app.route('/classificar_imagem', methods=['GET', 'POST'])
+def classificar_imagem():
+    if request.method == 'POST':
+        try:
+            imagem = request.files['imagem']
+
+            if imagem.filename == '':
+                return "Nenhuma imagem enviada."
+
+            caminho_imagem = os.path.join(app.config['UPLOAD_FOLDER'], imagem.filename)
+            imagem.save(caminho_imagem)
+
+            modelo_path = os.path.join(app.config['UPLOAD_FOLDER'], 'modelo_cnn.h5')
+            if not os.path.exists(modelo_path):
+                return "Modelo treinado não encontrado. Treine primeiro."
+
+            model = load_model(modelo_path)
+
+            img = Image.open(caminho_imagem).convert('RGB').resize((64, 64))
+            img_array = np.array(img) / 255.0
+            img_array = np.expand_dims(img_array, axis=0)
+
+            predicao = model.predict(img_array)
+            classe_predita = np.argmax(predicao)
+
+            return f"Classe prevista para a imagem: {classe_predita}"
+
+        except Exception as e:
+            return f"Erro ao classificar a imagem: {str(e)}"
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -26,34 +66,40 @@ def home():
 @app.route('/extracao_pixel', methods=['GET', 'POST'])
 def extracao_pixel():
     if request.method == 'POST':
-        folders = request.files.getlist('folders')
+        # Recebe as pastas enviadas como arquivos (não pastas de fato)
+        arquivos = request.files.getlist('folders')
 
-        if not folders:
-            return "Erro: Nenhum arquivo foi enviado."
+        if len(arquivos) < 2:
+            return "Erro: Ambas as pastas precisam ser enviadas."
 
+        # Diretórios onde as imagens serão salvas
         pasta_personagem1 = os.path.join(app.config['UPLOAD_FOLDER'], 'personagem_1')
         pasta_personagem2 = os.path.join(app.config['UPLOAD_FOLDER'], 'personagem_2')
 
         os.makedirs(pasta_personagem1, exist_ok=True)
         os.makedirs(pasta_personagem2, exist_ok=True)
 
-        for i, folder in enumerate(folders):
-            if folder.filename == '':
-                continue
+        # A primeira pasta (arquivo) vai para personagem_1
+        pasta_1 = arquivos[0]
+        if pasta_1 and hasattr(pasta_1, 'filename') and pasta_1.filename != '':
+            # Salva todos os arquivos dessa pasta em 'personagem_1'
+            for file in pasta_1:
+                filename = os.path.basename(file.filename)
+                try:
+                    file.save(os.path.join(pasta_personagem1, filename))
+                except Exception as e:
+                    return f"Erro ao salvar o arquivo {filename}: {str(e)}"
 
-            filename = os.path.basename(folder.filename)
-
-            # Arquivos enviados para a primeira pasta (personagem_1)
-            if i < len(folders) // 2:
-                destino = pasta_personagem1
-            # Arquivos enviados para a segunda pasta (personagem_2)
-            else:
-                destino = pasta_personagem2
-
-            try:
-                folder.save(os.path.join(destino, filename))
-            except Exception as e:
-                return f"Erro ao salvar o arquivo {filename}: {str(e)}"
+        # A segunda pasta (arquivo) vai para personagem_2
+        pasta_2 = arquivos[1]
+        if pasta_2 and hasattr(pasta_2, 'filename') and pasta_2.filename != '':
+            # Salva todos os arquivos dessa pasta em 'personagem_2'
+            for file in pasta_2:
+                filename = os.path.basename(file.filename)
+                try:
+                    file.save(os.path.join(pasta_personagem2, filename))
+                except Exception as e:
+                    return f"Erro ao salvar o arquivo {filename}: {str(e)}"
 
         # Após salvar as imagens, renomeia as imagens de ícones
         renomear_icons()
@@ -63,8 +109,8 @@ def extracao_pixel():
 
     return render_template('extracao_pixel.html')
 
+
 def renomear_icons():
-    # Pega a primeira imagem da pasta de personagem_1 e renomeia
     pasta_personagem1 = os.path.join(app.config['UPLOAD_FOLDER'], 'personagem_1')
     pasta_personagem2 = os.path.join(app.config['UPLOAD_FOLDER'], 'personagem_2')
 
@@ -121,7 +167,15 @@ def definir_atributos():
                 atributos_com_intervalo[personagem].append(intervalo)
 
         # Após definir os atributos, processa as imagens
-        gerar_csv(atributos_com_intervalo)
+        X_train, X_test, y_train, y_test = gerar_csv(atributos_com_intervalo)
+
+        # Após gerar o CSV e a divisão dos dados, cria e treina o modelo
+        modelo = criar_modelo(X_train.shape[1])
+        modelo.fit(X_train, y_train, epochs=10, batch_size=32)
+
+        # Avaliar o modelo
+        acuracia = modelo.evaluate(X_test, y_test)
+        print(f"Acurácia do modelo: {acuracia[1]*100}%")
 
         # Após gerar o CSV, disponibiliza para download
         if not os.path.exists(RESULTADO_CSV):
@@ -130,10 +184,6 @@ def definir_atributos():
         return send_file(RESULTADO_CSV, as_attachment=True)
 
     return render_template('definir_atributos.html')
-
-@app.route('/cnn')
-def cnn():
-    return render_template('cnn.html')
 
 def verificar_pixel(pixel, intervalo):
     r, g, b = pixel
@@ -144,6 +194,9 @@ def verificar_pixel(pixel, intervalo):
 def gerar_csv(atributos_com_intervalo):
     dados_csv = []
     pastas = ['personagem_1', 'personagem_2']
+
+    X = []  # Atributos
+    y = []  # Classes
 
     for personagem in pastas:
         pasta_completa = os.path.join(UPLOAD_FOLDER, personagem)
@@ -180,6 +233,13 @@ def gerar_csv(atributos_com_intervalo):
             dados_csv.append([nome_arquivo, 'personagem_1', contagem_p1])
             dados_csv.append([nome_arquivo, 'personagem_2', contagem_p2])
 
+            # Adicionar os dados para o modelo
+            X.append([contagem_p1, contagem_p2])  # Aqui você pode adicionar outras características, se necessário
+            y.append(0 if personagem == 'personagem_1' else 1)
+
+    # Dividir os dados em treinamento e teste
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
     # Salvar o CSV
     try:
         with open(RESULTADO_CSV, mode='w', newline='') as file:
@@ -188,6 +248,17 @@ def gerar_csv(atributos_com_intervalo):
             writer.writerows(dados_csv)
     except Exception as e:
         print(f"Erro ao salvar o CSV: {e}")
+
+    return X_train, X_test, y_train, y_test
+
+def criar_modelo(input_dim):
+    modelo = Sequential()
+    modelo.add(Dense(64, input_dim=input_dim, activation='relu'))
+    modelo.add(Dense(32, activation='relu'))
+    modelo.add(Dense(1, activation='sigmoid'))  # Saída binária (0 ou 1)
+
+    modelo.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    return modelo
 
 if __name__ == '__main__':
     app.run(debug=True)
