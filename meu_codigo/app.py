@@ -12,6 +12,10 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')  # Pasta 'uploads' dentro do d
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Pasta para salvar as imagens renomeadas como ícones
+ICONS_FOLDER = os.path.join(BASE_DIR, 'static', 'icons')
+os.makedirs(ICONS_FOLDER, exist_ok=True)
+
 # Caminho onde o CSV será salvo dentro da pasta de uploads
 RESULTADO_CSV = os.path.join(UPLOAD_FOLDER, 'resultado_extracao.csv')
 
@@ -51,10 +55,34 @@ def extracao_pixel():
             except Exception as e:
                 return f"Erro ao salvar o arquivo {filename}: {str(e)}"
 
+        # Após salvar as imagens, renomeia as imagens de ícones
+        renomear_icons()
+
         # Se tudo der certo, redireciona para a página de atributos
         return redirect(url_for('definir_atributos'))
 
     return render_template('extracao_pixel.html')
+
+def renomear_icons():
+    # Pega a primeira imagem da pasta de personagem_1 e renomeia
+    pasta_personagem1 = os.path.join(app.config['UPLOAD_FOLDER'], 'personagem_1')
+    pasta_personagem2 = os.path.join(app.config['UPLOAD_FOLDER'], 'personagem_2')
+
+    if os.path.exists(pasta_personagem1):
+        imagens_p1 = os.listdir(pasta_personagem1)
+        if imagens_p1:
+            imagem_personagem1 = imagens_p1[0]  # Pega a primeira imagem
+            caminho_imagem_p1 = os.path.join(pasta_personagem1, imagem_personagem1)
+            imagem_p1 = Image.open(caminho_imagem_p1)
+            imagem_p1.save(os.path.join(ICONS_FOLDER, 'icon_personagem_1.png'))  # Salva na pasta static/icons
+
+    if os.path.exists(pasta_personagem2):
+        imagens_p2 = os.listdir(pasta_personagem2)
+        if imagens_p2:
+            imagem_personagem2 = imagens_p2[0]  # Pega a primeira imagem
+            caminho_imagem_p2 = os.path.join(pasta_personagem2, imagem_personagem2)
+            imagem_p2 = Image.open(caminho_imagem_p2)
+            imagem_p2.save(os.path.join(ICONS_FOLDER, 'icon_personagem_2.png'))  # Salva na pasta static/icons
 
 @app.route('/definir_atributos', methods=['GET', 'POST'])
 def definir_atributos():
