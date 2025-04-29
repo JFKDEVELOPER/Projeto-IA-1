@@ -233,15 +233,27 @@ def cnn():
             for arquivo in folders:
                 if arquivo.filename == '':
                     continue
-                caminho_completo = os.path.join(pasta_cnn, arquivo.filename)
+
+                filename = os.path.basename(arquivo.filename)
+                caminho_completo = os.path.join(pasta_cnn, filename)
                 arquivo.save(caminho_completo)
 
-                nome_classe = arquivo.filename.split('/')[0] if '/' in arquivo.filename else arquivo.filename.split('\\')[0]
-                labels.append(nome_classe)
+                try:
+                    # Tenta abrir a imagem e adicionar ao dataset
+                    img = Image.open(caminho_completo).convert('RGB').resize((64, 64))
+                    img_array = np.array(img)
+                    imagens.append(img_array)
 
-                img = Image.open(caminho_completo).convert('RGB').resize((64, 64))
-                img_array = np.array(img)
-                imagens.append(img_array)
+                    # Agora que a imagem é válida, extrai a classe
+                    nome_classe = filename.split('_')[0]  # ou ajuste conforme sua estrutura
+                    labels.append(nome_classe)
+
+                except Exception as e:
+                    print(f"Ignorado: {filename} ({e})")
+                    continue
+
+            if len(imagens) != len(labels):
+                return f"Erro: número de imagens ({len(imagens)}) e labels ({len(labels)}) está diferente."
 
             imagens = np.array(imagens) / 255.0
             labels_unicos = list(set(labels))
@@ -278,6 +290,7 @@ def cnn():
 
     return render_template('cnn.html')
 
+
 # --- CNN: Classificar nova imagem --- #
 @app.route('/classificar_imagem', methods=['GET', 'POST'])
 def classificar_imagem():
@@ -299,7 +312,8 @@ def classificar_imagem():
             model = load_model(modelo_path)
             with open(labels_path, 'r') as f:
                 labels_map = json.load(f)
-            labels_map_invertido = {v: k for k, v in labels_map.items()}
+            labels_map_invertido = {int(v): k for k, v in labels_map.items()}
+
 
             img = Image.open(caminho_imagem).convert('RGB').resize((64, 64))
             img_array = np.array(img) / 255.0

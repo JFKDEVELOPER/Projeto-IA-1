@@ -6,18 +6,31 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #f7f9f9;
             padding: 20px;
             text-align: center;
         }
+
+        h1 {
+            color: #333;
+        }
+
         form {
-            margin-top: 30px;
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: auto;
         }
+
         input[type="file"] {
-            margin: 20px;
+            margin: 20px 0;
+            width: 100%;
         }
+
         button {
-            padding: 10px 20px;
+            padding: 10px 25px;
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -25,14 +38,27 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #45a049;
+        }
+
+        .voltar {
+            display: inline-block;
+            margin-top: 30px;
+            font-size: 16px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .voltar:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-<h1>Classificar uma Nova Imagem</h1>
+<h1>Classificar uma Nova Imagem (CNN)</h1>
 
 <form action="{{ url_for('classificar_imagem') }}" method="POST" enctype="multipart/form-data">
     <input type="file" name="imagem" required>
@@ -40,8 +66,7 @@
     <button type="submit">Classificar</button>
 </form>
 
-<br><br>
-<a href="{{ url_for('home') }}">Voltar para o Início</a>
+    <a class="voltar" href="{{ url_for('home') }}">← Voltar para o Início</a>
 
 </body>
 </html>
