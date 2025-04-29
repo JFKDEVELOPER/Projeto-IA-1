@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Redes Neurais</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            background-color: #f0f2f2;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #333;
+        }
+
+        .buttons {
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+
+        .button-box {
+            width: 250px;
+            height: 250px;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .button-box:hover {
+            background-color: #d0d0d0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Redes Neurais</h1>
+    <p>Jonathan ; Kauê ; Wesley</p>
+</header>
+
+<div class="buttons">
+    <!-- Extração de características por Pixel -->
+    <a href="{{ url_for('extracao_pixel') }}" class="button-box">
+        Extração de<br>Características por Pixel
+    </a>
+
+    <!-- Treinar CNN -->
+    <a href="{{ url_for('cnn') }}" class="button-box">
+        Treinar Rede Neural<br>Convolucional (CNN)
+    </a>
+
+    <!-- Classificar imagem usando Pixel -->
+    <a href="{{ url_for('classificar_imagem_pixel') }}" class="button-box">
+        Classificar Imagem<br>por Pixel
+    </a>
+
+    <!-- Classificar imagem usando CNN -->
+    <a href="{{ url_for('classificar_imagem') }}" class="button-box">
+        Classificar Imagem<br>por CNN
+    </a>
+</div>
+
+</body>
+</html>
