@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Rede Neural Convolucional (CNN)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f7f9f9;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input[type="file"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .voltar {
+            display: block;
+            margin: 30px auto 0;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .voltar:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rede Neural Convolucional (CNN)</h1>
+
+    <form action="{{ url_for('cnn') }}" method="post" enctype="multipart/form-data">
+        <label>Selecione as imagens (de diferentes classes):</label>
+        <input type="file" name="folders" webkitdirectory directory multiple required>
+
+        <label>Número de camadas:</label>
+        <input type="number" name="camadas" min="1" required>
+
+        <label>Número de neurônios por camada:</label>
+        <input type="number" name="neuronios" min="1" required>
+
+        <label>Quantidade de épocas:</label>
+        <input type="number" name="epocas" min="1" required>
+
+        <button type="submit">Treinar Modelo CNN</button>
+    </form>
+
+    <a class="voltar" href="{{ url_for('home') }}">← Voltar para o Início</a>
+</body>
+</html>
