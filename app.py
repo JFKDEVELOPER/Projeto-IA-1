@@ -50,21 +50,59 @@ def extracao_pixel():
 
     return render_template('extracao_pixel.html')
 
+
 def renomear_icons():
     pasta_personagem1 = os.path.join(UPLOAD_FOLDER, 'personagem_1')
     pasta_personagem2 = os.path.join(UPLOAD_FOLDER, 'personagem_2')
 
+    # Para o personagem 1
     if os.path.exists(pasta_personagem1):
         imagens_p1 = os.listdir(pasta_personagem1)
         if imagens_p1:
             imagem_p1 = Image.open(os.path.join(pasta_personagem1, imagens_p1[0]))
             imagem_p1.save(os.path.join(ICONS_FOLDER, 'icon_personagem_1.png'))
 
+            # Agora, adicione a lógica para sobrepor as cores no personagem
+            imagem_p1_np = np.array(imagem_p1)
+            # Aqui é onde você aplicaria o processo de extração por pixel para gerar as cores, como antes
+            # Exemplo fictício de previsão para cores:
+            predictions = np.random.randint(0, 3, size=imagem_p1_np.shape[:2])  # Classes fictícias (0, 1, 2)
+            mask = np.zeros_like(imagem_p1_np)
+
+            # Mapear as cores para as previsões
+            color_map = {
+                0: (255, 0, 0),  # Vermelho
+                1: (0, 255, 0),  # Verde
+                2: (0, 0, 255),  # Azul
+            }
+            for class_id, color in color_map.items():
+                mask[predictions == class_id] = color
+
+            # Sobrespor a imagem original com a máscara
+            overlay = cv2.addWeighted(imagem_p1_np, 0.7, mask, 0.3, 0)
+
+            # Salvar a imagem com a sobreposição
+            imagem_com_cores = Image.fromarray(overlay)
+            imagem_com_cores.save(os.path.join(ICONS_FOLDER, 'icon_personagem_1_com_cores.png'))
+
+    # Para o personagem 2 (mesma lógica)
     if os.path.exists(pasta_personagem2):
         imagens_p2 = os.listdir(pasta_personagem2)
         if imagens_p2:
             imagem_p2 = Image.open(os.path.join(pasta_personagem2, imagens_p2[0]))
             imagem_p2.save(os.path.join(ICONS_FOLDER, 'icon_personagem_2.png'))
+
+            imagem_p2_np = np.array(imagem_p2)
+            predictions = np.random.randint(0, 3, size=imagem_p2_np.shape[:2])  # Classes fictícias (0, 1, 2)
+            mask = np.zeros_like(imagem_p2_np)
+
+            for class_id, color in color_map.items():
+                mask[predictions == class_id] = color
+
+            overlay = cv2.addWeighted(imagem_p2_np, 0.7, mask, 0.3, 0)
+
+            imagem_com_cores = Image.fromarray(overlay)
+            imagem_com_cores.save(os.path.join(ICONS_FOLDER, 'icon_personagem_2_com_cores.png'))
 
 # --- PIXEL: Definir atributos e treinar MLP --- #
 @app.route('/definir_atributos', methods=['GET', 'POST'])
@@ -123,7 +161,6 @@ def processar_cores(atributos):
 def gerar_csv(atributos_com_intervalo):
     dados_csv = []
     pastas = ['personagem_1', 'personagem_2']
-
     X, y = [], []
 
     for personagem in pastas:
@@ -149,7 +186,6 @@ def gerar_csv(atributos_com_intervalo):
                         contagem_p2 += 1
 
             dados_csv.append([nome_arquivo, personagem, contagem_p1, contagem_p2])
-
             X.append([contagem_p1, contagem_p2])
             y.append(0 if personagem == 'personagem_1' else 1)
 

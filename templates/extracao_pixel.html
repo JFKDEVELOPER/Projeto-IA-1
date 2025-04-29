@@ -34,6 +34,28 @@
             border-radius: 4px;
             background-color: #fafafa;
         }
+        /* Estilo para o contêiner de ícone e cor */
+        .color-icon-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        /* Estilo do ícone */
+        .icon-img {
+            width: 40px;  /* Tamanho do ícone */
+            height: 40px; /* Tamanho do ícone */
+            margin-right: 15px; /* Espaço entre o ícone e o seletor de cor */
+        }
+        .color-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        /* Estilo para os inputs de cor */
+        input[type="color"] {
+            margin-left: 10px;
+        }
         .button-container {
             text-align: center;
             margin-top: 20px;
@@ -58,13 +80,67 @@
         <!-- Personagem 1 -->
         <div class="upload-section">
             <label for="personagem1">Selecione a pasta para o Personagem 1:</label>
-            <input type="file" name="folders" id="personagem1" webkitdirectory mozdirectory multiple required>
+            <input type="file" name="personagem1" id="personagem1" webkitdirectory mozdirectory multiple required>
+        </div>
+
+        <!-- Cores do Personagem 1 -->
+        <div class="upload-section">
+            <label for="personagem1_cor1">Cor 1:</label>
+            <div class="color-icon-container">
+                <!-- Ícone do Personagem 1 -->
+                <img src="{{ url_for('static', filename='icons/icon_personagem_1.png') }}" alt="Ícone Personagem 1" class="icon-img">
+                <input type="color" name="personagem1_cor1" id="personagem1_cor1" value="#ff0000" onchange="updateColor('personagem1_cor1')">
+                <div id="color1" class="color-circle" style="background-color: #ff0000;"></div>
+            </div>
+
+            <label for="personagem1_cor2">Cor 2:</label>
+            <div class="color-icon-container">
+                <!-- Ícone do Personagem 1 -->
+                <img src="{{ url_for('static', filename='icons/icon_personagem_1.png') }}" alt="Ícone Personagem 1" class="icon-img">
+                <input type="color" name="personagem1_cor2" id="personagem1_cor2" value="#00ff00" onchange="updateColor('personagem1_cor2')">
+                <div id="color2" class="color-circle" style="background-color: #00ff00;"></div>
+            </div>
+
+            <label for="personagem1_cor3">Cor 3:</label>
+            <div class="color-icon-container">
+                <!-- Ícone do Personagem 1 -->
+                <img src="{{ url_for('static', filename='icons/icon_personagem_1.png') }}" alt="Ícone Personagem 1" class="icon-img">
+                <input type="color" name="personagem1_cor3" id="personagem1_cor3" value="#0000ff" onchange="updateColor('personagem1_cor3')">
+                <div id="color3" class="color-circle" style="background-color: #0000ff;"></div>
+            </div>
         </div>
 
         <!-- Personagem 2 -->
         <div class="upload-section">
             <label for="personagem2">Selecione a pasta para o Personagem 2:</label>
-            <input type="file" name="folders" id="personagem2" webkitdirectory mozdirectory multiple required>
+            <input type="file" name="personagem2" id="personagem2" webkitdirectory mozdirectory multiple required>
+        </div>
+
+        <!-- Cores do Personagem 2 -->
+        <div class="upload-section">
+            <label for="personagem2_cor1">Cor 1:</label>
+            <div class="color-icon-container">
+                <!-- Ícone do Personagem 2 -->
+                <img src="{{ url_for('static', filename='icons/icon_personagem_2.png') }}" alt="Ícone Personagem 2" class="icon-img">
+                <input type="color" name="personagem2_cor1" id="personagem2_cor1" value="#ff0000" onchange="updateColor('personagem2_cor1')">
+                <div id="color4" class="color-circle" style="background-color: #ff0000;"></div>
+            </div>
+
+            <label for="personagem2_cor2">Cor 2:</label>
+            <div class="color-icon-container">
+                <!-- Ícone do Personagem 2 -->
+                <img src="{{ url_for('static', filename='icons/icon_personagem_2.png') }}" alt="Ícone Personagem 2" class="icon-img">
+                <input type="color" name="personagem2_cor2" id="personagem2_cor2" value="#00ff00" onchange="updateColor('personagem2_cor2')">
+                <div id="color5" class="color-circle" style="background-color: #00ff00;"></div>
+            </div>
+
+            <label for="personagem2_cor3">Cor 3:</label>
+            <div class="color-icon-container">
+                <!-- Ícone do Personagem 2 -->
+                <img src="{{ url_for('static', filename='icons/icon_personagem_2.png') }}" alt="Ícone Personagem 2" class="icon-img">
+                <input type="color" name="personagem2_cor3" id="personagem2_cor3" value="#0000ff" onchange="updateColor('personagem2_cor3')">
+                <div id="color6" class="color-circle" style="background-color: #0000ff;"></div>
+            </div>
         </div>
 
         <div class="button-container">
@@ -72,7 +148,17 @@
         </div>
     </form>
 
+
     <a class="voltar" href="{{ url_for('home') }}">← Voltar para o Início</a>
+
+
+    <script>
+        function updateColor(corId) {
+            const colorValue = document.getElementById(corId).value;
+            const colorCircleId = 'color' + corId.slice(-1); // get last digit of the input id for corresponding circle
+            document.getElementById(colorCircleId).style.backgroundColor = colorValue;
+        }
+    </script>
 
 </body>
 </html>
