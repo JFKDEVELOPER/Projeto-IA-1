@@ -1,6 +1,7 @@
 import os
 import json
 import csv
+import cv2
 import numpy as np
 from flask import Flask, render_template, request, redirect, url_for, send_file
 from PIL import Image
@@ -29,26 +30,48 @@ def home():
     return render_template('index.html')
 
 # --- PIXEL: Upload das pastas --- #
+import os
+
 @app.route('/extracao_pixel', methods=['GET', 'POST'])
 def extracao_pixel():
     if request.method == 'POST':
-        arquivos = request.files.getlist('folders')
-        if len(arquivos) < 2:
+        pasta_personagem1 = request.files.getlist('personagem1')
+        pasta_personagem2 = request.files.getlist('personagem2')
+
+        if not pasta_personagem1 or not pasta_personagem2:
             return "Erro: Ambas as pastas precisam ser enviadas."
 
-        pasta_personagem1 = os.path.join(UPLOAD_FOLDER, 'personagem_1')
-        pasta_personagem2 = os.path.join(UPLOAD_FOLDER, 'personagem_2')
-        os.makedirs(pasta_personagem1, exist_ok=True)
-        os.makedirs(pasta_personagem2, exist_ok=True)
+        caminho_personagem1 = os.path.join(UPLOAD_FOLDER, 'personagem_1')
+        caminho_personagem2 = os.path.join(UPLOAD_FOLDER, 'personagem_2')
 
-        arquivos[0].save(os.path.join(pasta_personagem1, arquivos[0].filename))
-        arquivos[1].save(os.path.join(pasta_personagem2, arquivos[1].filename))
+        # Criação das pastas principais (se não existirem)
+        os.makedirs(caminho_personagem1, exist_ok=True)
+        os.makedirs(caminho_personagem2, exist_ok=True)
+
+        # Salvando arquivos da pasta do personagem 1
+        for arquivo in pasta_personagem1:
+            caminho_arquivo = os.path.join(caminho_personagem1, arquivo.filename)
+            # Criação da subpasta (se necessário)
+            if not os.path.exists(os.path.dirname(caminho_arquivo)):
+                os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
+            arquivo.save(caminho_arquivo)
+
+        # Salvando arquivos da pasta do personagem 2
+        for arquivo in pasta_personagem2:
+            caminho_arquivo = os.path.join(caminho_personagem2, arquivo.filename)
+            # Criação da subpasta (se necessário)
+            if not os.path.exists(os.path.dirname(caminho_arquivo)):
+                os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
+            arquivo.save(caminho_arquivo)
 
         renomear_icons()
 
         return redirect(url_for('definir_atributos'))
 
     return render_template('extracao_pixel.html')
+
+
+
 
 
 def renomear_icons():
