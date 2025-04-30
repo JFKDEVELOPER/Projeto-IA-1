@@ -2,12 +2,13 @@ import os
 import json
 import csv
 import numpy as np
-from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask import Flask, render_template, request, redirect, url_for, send_file, flash
 from PIL import Image
 from tensorflow.keras.models import load_model, Sequential
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
+
 
 app = Flask(__name__)
 
@@ -28,50 +29,79 @@ RESULTADO_CSV = os.path.join(UPLOAD_FOLDER, 'resultado_extracao.csv')
 def home():
     return render_template('index.html')
 
+
 # --- PIXEL: Upload das pastas --- #
+
+
 import os
+from flask import request, render_template, redirect, url_for, flash
+
+UPLOAD_FOLDER = 'uploads'
+
+
+
+import os
+import shutil
 
 @app.route('/extracao_pixel', methods=['GET', 'POST'])
 def extracao_pixel():
     if request.method == 'POST':
-        pasta_personagem1 = request.files.getlist('personagem1')
-        pasta_personagem2 = request.files.getlist('personagem2')
+        try:
+            arquivos1 = request.files.getlist('personagem1')
+            arquivos2 = request.files.getlist('personagem2')
 
-        if not pasta_personagem1 or not pasta_personagem2:
-            return "Erro: Ambas as pastas precisam ser enviadas."
+            if not arquivos1 or not arquivos2:
+                flash("Erro: Ambas as pastas precisam ser enviadas.", "danger")
+                return redirect(request.url)
 
-        caminho_personagem1 = os.path.join(UPLOAD_FOLDER, 'personagem_1')
-        caminho_personagem2 = os.path.join(UPLOAD_FOLDER, 'personagem_2')
+            pasta_personagem1 = os.path.join(UPLOAD_FOLDER, 'personagem_1')
+            pasta_personagem2 = os.path.join(UPLOAD_FOLDER, 'personagem_2')
+            os.makedirs(pasta_personagem1, exist_ok=True)
+            os.makedirs(pasta_personagem2, exist_ok=True)
 
-        # Criação das pastas principais (se não existirem)
-        os.makedirs(caminho_personagem1, exist_ok=True)
-        os.makedirs(caminho_personagem2, exist_ok=True)
+            def salvar_arquivos(arquivos, destino_base):
+                for arquivo in arquivos:
+                    if arquivo and arquivo.filename:
+                        caminho_relativo = arquivo.filename.replace('\\', '/')
+                        caminho_completo = os.path.join(destino_base, caminho_relativo)
+                        os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
+                        arquivo.save(caminho_completo)
 
-        # Salvando arquivos da pasta do personagem 1
-        for arquivo in pasta_personagem1:
-            caminho_arquivo = os.path.join(caminho_personagem1, arquivo.filename)
-            # Criação da subpasta (se necessário)
-            if not os.path.exists(os.path.dirname(caminho_arquivo)):
-                os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
-            arquivo.save(caminho_arquivo)
+            salvar_arquivos(arquivos1, pasta_personagem1)
+            salvar_arquivos(arquivos2, pasta_personagem2)
 
-        # Salvando arquivos da pasta do personagem 2
-        for arquivo in pasta_personagem2:
-            caminho_arquivo = os.path.join(caminho_personagem2, arquivo.filename)
-            # Criação da subpasta (se necessário)
-            if not os.path.exists(os.path.dirname(caminho_arquivo)):
-                os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
-            arquivo.save(caminho_arquivo)
+            renomear_icons()
+            flash("Arquivos processados com sucesso!", "success")
+            return redirect(url_for('definir_atributos'))
 
-        renomear_icons()
-
-        return redirect(url_for('definir_atributos'))
+        except Exception as e:
+            flash(f"Erro ao processar os arquivos: {str(e)}", "danger")
+            return redirect(request.url)
 
     return render_template('extracao_pixel.html')
+    
 
 
+    import os
+import shutil
 
+def salvar_arquivos(arquivos, destino_base):
+    for arquivo in arquivos:
+        if arquivo and arquivo.filename:
+            caminho_relativo = arquivo.filename.replace('\\', '/')
+            caminho_completo = os.path.join(destino_base, caminho_relativo)
 
+            # Garante que não está tentando salvar um arquivo em cima de uma pasta
+            if os.path.isdir(caminho_completo):
+                shutil.rmtree(caminho_completo)
+
+            os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
+
+            # Se já existe um arquivo com o mesmo nome, remove antes
+            if os.path.exists(caminho_completo):
+                os.remove(caminho_completo)
+
+            arquivo.save(caminho_completo)
 
 def renomear_icons():
     pasta_personagem1 = os.path.join(UPLOAD_FOLDER, 'personagem_1')
@@ -159,6 +189,7 @@ def definir_atributos():
             return f"Erro ao processar atributos: {str(e)}"
 
     return render_template('definir_atributos.html')
+
 
 def processar_cores(atributos):
     tolerancia = 20
@@ -402,4 +433,5 @@ def classificar_imagem():
 
 # --- Rodar o servidor --- #
 if __name__ == '__main__':
+    app.secret_key = os.urandom(24)  # Define a chave antes de rodar o servidor
     app.run(debug=True, port=5001)
