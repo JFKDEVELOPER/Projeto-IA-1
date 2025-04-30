@@ -29,26 +29,48 @@ def home():
     return render_template('index.html')
 
 # --- PIXEL: Upload das pastas --- #
+import os
+
 @app.route('/extracao_pixel', methods=['GET', 'POST'])
 def extracao_pixel():
     if request.method == 'POST':
-        arquivos = request.files.getlist('folders')
-        if len(arquivos) < 2:
+        pasta_personagem1 = request.files.getlist('personagem1')
+        pasta_personagem2 = request.files.getlist('personagem2')
+
+        if not pasta_personagem1 or not pasta_personagem2:
             return "Erro: Ambas as pastas precisam ser enviadas."
 
-        pasta_personagem1 = os.path.join(UPLOAD_FOLDER, 'personagem_1')
-        pasta_personagem2 = os.path.join(UPLOAD_FOLDER, 'personagem_2')
-        os.makedirs(pasta_personagem1, exist_ok=True)
-        os.makedirs(pasta_personagem2, exist_ok=True)
+        caminho_personagem1 = os.path.join(UPLOAD_FOLDER, 'personagem_1')
+        caminho_personagem2 = os.path.join(UPLOAD_FOLDER, 'personagem_2')
 
-        arquivos[0].save(os.path.join(pasta_personagem1, arquivos[0].filename))
-        arquivos[1].save(os.path.join(pasta_personagem2, arquivos[1].filename))
+        # Criação das pastas principais (se não existirem)
+        os.makedirs(caminho_personagem1, exist_ok=True)
+        os.makedirs(caminho_personagem2, exist_ok=True)
+
+        # Salvando arquivos da pasta do personagem 1
+        for arquivo in pasta_personagem1:
+            caminho_arquivo = os.path.join(caminho_personagem1, arquivo.filename)
+            # Criação da subpasta (se necessário)
+            if not os.path.exists(os.path.dirname(caminho_arquivo)):
+                os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
+            arquivo.save(caminho_arquivo)
+
+        # Salvando arquivos da pasta do personagem 2
+        for arquivo in pasta_personagem2:
+            caminho_arquivo = os.path.join(caminho_personagem2, arquivo.filename)
+            # Criação da subpasta (se necessário)
+            if not os.path.exists(os.path.dirname(caminho_arquivo)):
+                os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
+            arquivo.save(caminho_arquivo)
 
         renomear_icons()
 
         return redirect(url_for('definir_atributos'))
 
     return render_template('extracao_pixel.html')
+
+
+
 
 
 def renomear_icons():
@@ -270,22 +292,32 @@ def cnn():
                 if arquivo.filename == '':
                     continue
 
+                # Corrigir caminho relativo (compatível com Windows e Linux)
+                caminho_relativo = arquivo.filename.replace('\\', '/')
+                partes = caminho_relativo.split('/')
+
+                if len(partes) >= 2:
+                    nome_classe = partes[-2]
+                else:
+                    nome_classe = 'desconhecida'
+
+                # Criar pasta da classe
+                pasta_classe = os.path.join(pasta_cnn, nome_classe)
+                os.makedirs(pasta_classe, exist_ok=True)
+
+                # Salvar o arquivo
                 filename = os.path.basename(arquivo.filename)
-                caminho_completo = os.path.join(pasta_cnn, filename)
+                caminho_completo = os.path.join(pasta_classe, filename)
                 arquivo.save(caminho_completo)
 
                 try:
-                    # Tenta abrir a imagem e adicionar ao dataset
+                    # Processar imagem
                     img = Image.open(caminho_completo).convert('RGB').resize((64, 64))
                     img_array = np.array(img)
                     imagens.append(img_array)
-
-                    # Agora que a imagem é válida, extrai a classe
-                    nome_classe = filename.split('_')[0]  # ou ajuste conforme sua estrutura
                     labels.append(nome_classe)
-
                 except Exception as e:
-                    print(f"Ignorado: {filename} ({e})")
+                    print(f"Ignorado: {caminho_completo} ({e})")
                     continue
 
             if len(imagens) != len(labels):
@@ -325,6 +357,8 @@ def cnn():
             return f"Erro durante o treinamento: {str(e)}"
 
     return render_template('cnn.html')
+
+
 
 
 # --- CNN: Classificar nova imagem --- #
