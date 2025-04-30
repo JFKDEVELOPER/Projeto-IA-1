@@ -1,7 +1,6 @@
 import os
 import json
 import csv
-import cv2
 import numpy as np
 from flask import Flask, render_template, request, redirect, url_for, send_file
 from PIL import Image
@@ -293,22 +292,32 @@ def cnn():
                 if arquivo.filename == '':
                     continue
 
+                # Corrigir caminho relativo (compatível com Windows e Linux)
+                caminho_relativo = arquivo.filename.replace('\\', '/')
+                partes = caminho_relativo.split('/')
+
+                if len(partes) >= 2:
+                    nome_classe = partes[-2]
+                else:
+                    nome_classe = 'desconhecida'
+
+                # Criar pasta da classe
+                pasta_classe = os.path.join(pasta_cnn, nome_classe)
+                os.makedirs(pasta_classe, exist_ok=True)
+
+                # Salvar o arquivo
                 filename = os.path.basename(arquivo.filename)
-                caminho_completo = os.path.join(pasta_cnn, filename)
+                caminho_completo = os.path.join(pasta_classe, filename)
                 arquivo.save(caminho_completo)
 
                 try:
-                    # Tenta abrir a imagem e adicionar ao dataset
+                    # Processar imagem
                     img = Image.open(caminho_completo).convert('RGB').resize((64, 64))
                     img_array = np.array(img)
                     imagens.append(img_array)
-
-                    # Agora que a imagem é válida, extrai a classe
-                    nome_classe = filename.split('_')[0]  # ou ajuste conforme sua estrutura
                     labels.append(nome_classe)
-
                 except Exception as e:
-                    print(f"Ignorado: {filename} ({e})")
+                    print(f"Ignorado: {caminho_completo} ({e})")
                     continue
 
             if len(imagens) != len(labels):
@@ -348,6 +357,8 @@ def cnn():
             return f"Erro durante o treinamento: {str(e)}"
 
     return render_template('cnn.html')
+
+
 
 
 # --- CNN: Classificar nova imagem --- #
