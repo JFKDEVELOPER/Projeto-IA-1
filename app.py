@@ -29,20 +29,6 @@ RESULTADO_CSV = os.path.join(UPLOAD_FOLDER, 'resultado_extracao.csv')
 def home():
     return render_template('index.html')
 
-
-# --- PIXEL: Upload das pastas --- #
-
-
-import os
-from flask import request, render_template, redirect, url_for, flash
-
-UPLOAD_FOLDER = 'uploads'
-
-
-
-import os
-import shutil
-
 @app.route('/extracao_pixel', methods=['GET', 'POST'])
 def extracao_pixel():
     if request.method == 'POST':
@@ -50,28 +36,44 @@ def extracao_pixel():
             arquivos1 = request.files.getlist('personagem1')
             arquivos2 = request.files.getlist('personagem2')
 
+            # Verificar se ambas as pastas foram enviadas
             if not arquivos1 or not arquivos2:
                 flash("Erro: Ambas as pastas precisam ser enviadas.", "danger")
                 return redirect(request.url)
 
+            # Definir caminhos para as pastas de destino
             pasta_personagem1 = os.path.join(UPLOAD_FOLDER, 'personagem_1')
             pasta_personagem2 = os.path.join(UPLOAD_FOLDER, 'personagem_2')
+
+            # Criar as pastas de destino, se não existirem
             os.makedirs(pasta_personagem1, exist_ok=True)
             os.makedirs(pasta_personagem2, exist_ok=True)
 
+            # Função para salvar os arquivos
             def salvar_arquivos(arquivos, destino_base):
                 for arquivo in arquivos:
                     if arquivo and arquivo.filename:
                         caminho_relativo = arquivo.filename.replace('\\', '/')
                         caminho_completo = os.path.join(destino_base, caminho_relativo)
                         os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
+
+                        # Verificar se o arquivo já existe e excluir se necessário
+                        if os.path.exists(caminho_completo):
+                            os.remove(caminho_completo)
+
                         arquivo.save(caminho_completo)
 
+            # Salvar os arquivos para cada personagem
             salvar_arquivos(arquivos1, pasta_personagem1)
             salvar_arquivos(arquivos2, pasta_personagem2)
 
+            # Renomear ícones (presumo que esta função já exista)
             renomear_icons()
+
+            # Mensagem de sucesso
             flash("Arquivos processados com sucesso!", "success")
+
+            # Redirecionar para a página 'definir_atributos'
             return redirect(url_for('definir_atributos'))
 
         except Exception as e:
@@ -79,11 +81,9 @@ def extracao_pixel():
             return redirect(request.url)
 
     return render_template('extracao_pixel.html')
+
     
 
-
-    import os
-import shutil
 
 def salvar_arquivos(arquivos, destino_base):
     for arquivo in arquivos:
@@ -102,6 +102,7 @@ def salvar_arquivos(arquivos, destino_base):
                 os.remove(caminho_completo)
 
             arquivo.save(caminho_completo)
+            
 
 def renomear_icons():
     pasta_personagem1 = os.path.join(UPLOAD_FOLDER, 'personagem_1')
