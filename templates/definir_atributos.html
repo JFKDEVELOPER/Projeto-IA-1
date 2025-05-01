@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Definir Atributos de Cores</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -121,7 +122,6 @@
             text-align: center;
         }
 
-        /* Melhorias no layout das instruções */
         .color-instruction {
             background-color: #E1F5FE;
             padding: 15px;
@@ -157,27 +157,13 @@
                     <div class="color-instruction">Defina as cores características para o Personagem 1!</div>
 
                     <label>Atributo 1:</label>
-                    <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem1_cor1', '{{ color }}', this)"></button>
-
-                    </div>
+                    <div id="color-picker1"></div>
 
                     <label>Atributo 2:</label>
-                    <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem1_cor2', '{{ color }}', this)"></button>
-                    </div>
+                    <div id="color-picker2"></div>
 
                     <label>Atributo 3:</label>
-                    <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem1_cor3', '{{ color }}', this)"></button>
-
-                    </div>
+                    <div id="color-picker3"></div>
                 </div>
             </div>
 
@@ -196,28 +182,13 @@
                     <div class="color-instruction">Defina as cores características para o Personagem 2!</div>
 
                     <label>Atributo 1:</label>
-                    <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem2_cor1', '{{ color }}', this)"></button>
-
-                    </div>
+                    <div id="color-picker4"></div>
 
                     <label>Atributo 2:</label>
-                    <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem2_cor2', '{{ color }}', this)"></button>
-
-                    </div>
+                    <div id="color-picker5"></div>
 
                     <label>Atributo 3:</label>
-                    <div>
-
-                        <button type="button" class="color-button" style="background-color: '{{ color }}';"
-                            onclick="setColor('personagem2_cor3', '{{ color }}', this)"></button>
-
-                    </div>
+                    <div id="color-picker6"></div>
                 </div>
             </div>
 
@@ -225,20 +196,138 @@
         </form>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+
     <script>
-        function setColor(inputId, color, button) {
-            document.getElementById(inputId).value = color;
-
-            // Remover a classe 'selected' de todos os botões na mesma linha
-            let buttons = button.parentElement.getElementsByClassName('color-button');
-            for (let i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove('selected');
+        // Personagem 1 - Seletor de cores
+        const pickr1 = Pickr.create({
+            el: '#color-picker1',
+            theme: 'nano',
+            default: '#ff0000',
+            swatches: ['#ff0000', '#00ff00', '#0000ff', '#ffff00'],
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgb: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                }
             }
+        }).on('change', (color) => {
+            document.getElementById('personagem1_cor1').value = color.toHEXA().toString();
+        });
 
-            // Adicionar a classe 'selected' ao botão clicado
-            button.classList.add('selected');
-        }
+        const pickr2 = Pickr.create({
+            el: '#color-picker2',
+            theme: 'nano',
+            default: '#00ff00',
+            swatches: ['#ff0000', '#00ff00', '#0000ff', '#ffff00'],
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgb: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                }
+            }
+        }).on('change', (color) => {
+            document.getElementById('personagem1_cor2').value = color.toHEXA().toString();
+        });
+
+        const pickr3 = Pickr.create({
+            el: '#color-picker3',
+            theme: 'nano',
+            default: '#0000ff',
+            swatches: ['#ff0000', '#00ff00', '#0000ff', '#ffff00'],
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgb: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                }
+            }
+        }).on('change', (color) => {
+            document.getElementById('personagem1_cor3').value = color.toHEXA().toString();
+        });
+
+        // Personagem 2 - Seletor de cores
+        const pickr4 = Pickr.create({
+            el: '#color-picker4',
+            theme: 'nano',
+            default: '#ff0000',
+            swatches: ['#ff0000', '#00ff00', '#0000ff', '#ffff00'],
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgb: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                }
+            }
+        }).on('change', (color) => {
+            document.getElementById('personagem2_cor1').value = color.toHEXA().toString();
+        });
+
+        const pickr5 = Pickr.create({
+            el: '#color-picker5',
+            theme: 'nano',
+            default: '#00ff00',
+            swatches: ['#ff0000', '#00ff00', '#0000ff', '#ffff00'],
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgb: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                }
+            }
+        }).on('change', (color) => {
+            document.getElementById('personagem2_cor2').value = color.toHEXA().toString();
+        });
+
+        const pickr6 = Pickr.create({
+            el: '#color-picker6',
+            theme: 'nano',
+            default: '#0000ff',
+            swatches: ['#ff0000', '#00ff00', '#0000ff', '#ffff00'],
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+                interaction: {
+                    hex: true,
+                    rgb: true,
+                    rgba: true,
+                    hsla: true,
+                    hsva: true,
+                }
+            }
+        }).on('change', (color) => {
+            document.getElementById('personagem2_cor3').value = color.toHEXA().toString();
+        });
     </script>
+
 </body>
 
 </html>
