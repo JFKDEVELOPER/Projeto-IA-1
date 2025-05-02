@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Rede Neural Convolucional (CNN)</title>
+    <title>Treinamento CNN</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,6 +52,17 @@
             background-color: #45a049;
         }
 
+        .imagem-matriz {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .imagem-matriz img {
+            max-width: 90%;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+
         .voltar {
             display: block;
             margin: 30px auto 0;
@@ -67,10 +78,10 @@
     </style>
 </head>
 <body>
-    <h1>Rede Neural Convolucional (CNN)</h1>
+    <h1>Treinar Rede Neural Convolucional (CNN)</h1>
 
-    <form action="{{ url_for('cnn_treinamento') }}" method="post" enctype="multipart/form-data">
-        <label>Selecione as imagens (de diferentes classes):</label>
+    <form action="{{ url_for('treinamento_cnn') }}" method="post" enctype="multipart/form-data">
+        <label>Selecione as imagens (em subpastas por classe):</label>
         <input type="file" name="folders" webkitdirectory directory multiple required>
 
         <label>Número de camadas:</label>
@@ -82,9 +93,26 @@
         <label>Quantidade de épocas:</label>
         <input type="number" name="epocas" min="1" required>
 
-        <button type="submit">Treinar Modelo CNN</button>
+        <button type="submit">Treinar Modelo</button>
     </form>
 
-    <a class="voltar" href="{{ url_for('home') }}">← Voltar para o Início</a>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul style="text-align:center; list-style: none;">
+            {% for category, message in messages %}
+            <li style=""color: {{ 'green' if category == 'success' else 'red' }};">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    {% if matriz_existe %}
+    <div class="imagem-matriz">
+        <h2>Matriz de Confusão</h2>
+        <img src="{{ url_for('static', filename='matriz_cnn.png') }}" alt="Matriz de Confusão">
+    </div>
+    {% endif %}
+
+    <a class="voltar" href="{{ url_for('home') }}">← Voltar ao Início</a>
 </body>
 </html>

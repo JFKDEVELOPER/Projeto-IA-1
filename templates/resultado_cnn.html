@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado do Treinamento CNN</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .resultado {
+            margin-top: 30px;
+            font-size: 20px;
+            background-color: #e6ffe6;
+            padding: 20px;
+            display: inline-block;
+            border-radius: 8px;
+        }
+
+        .imagem-matriz {
+            margin-top: 40px;
+        }
+
+        .imagem-matriz img {
+            max-width: 80%;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+
+        a {
+            display: block;
+            margin-top: 30px;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Resultado do Treinamento da Rede CNN</h1>
+
+{% if acuracia %}
+<div class="resultado">
+    Modelo treinado com sucesso! Acurácia: {{ acuracia }}%
+</div>
+{% endif %}
+
+{% if matriz_path %}
+    <div class="imagem-matriz">
+        <h2>Matriz de Confusão</h2>
+        <img src="{{ url_for('static', filename='matriz_cnn.png') }}" alt="Matriz de Confusão">
+    </div>
+{% endif %}
+
+<a href="{{ url_for('home') }}">← Voltar para o Início</a>
+
+</body>
+</html>
