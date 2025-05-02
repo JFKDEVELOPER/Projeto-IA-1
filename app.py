@@ -60,8 +60,11 @@ def treinamento_cnn():
 @app.route('/classificar_imagem_cnn', methods=['GET', 'POST'])
 def classificar_imagem_cnn_route():
     if request.method == 'POST':
-        return classificar_imagem_cnn(request.files['imagem'])
+        resultado = classificar_imagem_cnn(request.files['imagem'])
+        flash(resultado)
+        return redirect(url_for('classificar_imagem_cnn_route'))
     return render_template('classificar_imagem_cnn.html')
+
 
 @app.route('/resultado_cnn')
 def resultado_cnn():

@@ -1,33 +1,43 @@
 # services/classificacao_cnn.py
 
-import numpy as np
-from tensorflow.keras.models import load_model
-from PIL import Image
-import json
 import os
+import json
+import numpy as np
+from PIL import Image
+from tensorflow.keras.models import load_model
 
-MODELOS_FOLDER = os.path.join('models')
+MODELO_PATH = os.path.join('models', 'modelo_cnn.h5')
+LABELS_PATH = os.path.join('models', 'labels_map.json')
 
 def classificar_imagem_cnn(imagem_file):
     try:
-        modelo_path = os.path.join(MODELOS_FOLDER, 'modelo_cnn.h5')
-        labels_path = os.path.join(MODELOS_FOLDER, 'labels_map.json')
+        # Carregar o modelo treinado
+        modelo = load_model(MODELO_PATH)
 
-        if not os.path.exists(modelo_path) or not os.path.exists(labels_path):
-            return "Modelo ou mapeamento de classes não encontrado."
-
-        model = load_model(modelo_path)
-        with open(labels_path, 'r') as f:
+        # Carregar o mapeamento de rótulos
+        with open(LABELS_PATH, 'r') as f:
             labels_map = json.load(f)
 
-        imagem = Image.open(imagem_file).convert('RGB').resize((64, 64))
-        imagem_array = np.array(imagem) / 255.0
-        imagem_array = np.expand_dims(imagem_array, axis=0)
+        # Inverter o dicionário: índice → nome da classe
+        labels_map_inv = {int(v): k for k, v in labels_map.items()}
 
-        predicao = model.predict(imagem_array)
+        # Processar imagem
+        img = Image.open(imagem_file).convert('RGB').resize((64, 64))
+        img_array = np.array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+
+        # Fazer predição
+        predicao = modelo.predict(img_array)
         classe_idx = int(np.argmax(predicao))
-        nome_classe = labels_map.get(str(classe_idx), "Classe desconhecida")
 
-        return f"Classe prevista: {nome_classe}"
+        # DEBUG opcional (remova se não quiser no terminal):
+        print("Probabilidades:", predicao)
+        print("Classe índice prevista:", classe_idx)
+        print("Labels invertido:", labels_map_inv)
+
+        classe_nome = labels_map_inv.get(classe_idx, "Classe desconhecida")
+
+        return f"Classe prevista: {classe_nome}"
+
     except Exception as e:
-        return f"Erro ao classificar a imagem: {str(e)}"
+        return f"Erro ao classificar imagem: {str(e)}"

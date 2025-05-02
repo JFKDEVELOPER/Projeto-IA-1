@@ -1,24 +1,46 @@
-<!-- templates/classificar_imagem_cnn.html -->
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Classificar Imagem com CNN</title>
+    <title>Classificar Imagem por CNN</title>
+    <style>
+        body { font-family: Arial; background: #f4f4f9; text-align: center; padding: 50px; }
+        form { margin: 20px auto; display: inline-block; }
+        input[type="file"] { margin: 20px; }
+        button {
+            padding: 10px 20px; background-color: #4CAF50;
+            color: white; border: none; border-radius: 5px;
+            cursor: pointer; font-size: 16px;
+        }
+        button:hover { background-color: #45a049; }
+        .resultado {
+            margin-top: 30px; font-size: 18px;
+            background-color: #e6ffe6; padding: 20px;
+            display: inline-block; border-radius: 8px;
+        }
+        a { margin-top: 30px; display: block; text-decoration: none; color: #007bff; }
+        a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
-    <h1>Classificar Imagem com CNN</h1>
 
-    <form method="POST" enctype="multipart/form-data">
-        <label for="imagem">Escolha uma imagem:</label><br>
-        <input type="file" name="imagem" accept="image/*" required><br><br>
-        <button type="submit">Classificar</button>
-    </form>
+<h1>Classificação de Imagem com CNN</h1>
 
-    {% if resultado %}
-        <h2>Resultado:</h2>
-        <p>{{ resultado }}</p>
+<form action="{{ url_for('classificar_imagem_cnn_route') }}" method="post" enctype="multipart/form-data">
+    <input type="file" name="imagem" required>
+    <br>
+    <button type="submit">Classificar Imagem</button>
+</form>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="resultado">{{ message }}</div>
+        {% endfor %}
     {% endif %}
-    
-    <a href="{{ url_for('home') }}">Voltar para o início</a>
+{% endwith %}
+
+<a href="{{ url_for('home') }}">← Voltar ao Início</a>
+
 </body>
 </html>
